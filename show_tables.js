@@ -582,10 +582,10 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 
       var list_html = '<thead><tr>' + '<th align="center"><button type="button" class="add_genome_all" title="Select all">'+
 	    '<img src="img/plus.png" border="0" height="15" width="15"></button></th>' +
-	    '<th>UniProt ID</th>' +
-	    '<th>Taxonomy ID</th>' +
+	    '<th>Proteome ID</th>' +
+	    '<th>Tax ID</th>' +
 	    '<th>Code</th>' +
-	    '<th>Name</th><th>Proteins</th>' +
+	    '<th>Species Name</th><th>Proteins</th>' +
 	    '<th>CPD</th>' +
 	    '<th>BUSCO</th>' +
 	    // '<th align="center">Release date</th><th>Reference</th>' +
