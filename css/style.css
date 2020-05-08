@@ -139,3 +139,7 @@ button {
     overflow:visible;
     cursor:pointer;
 }
+
+.thin {
+    font-weight: normal;
+}
