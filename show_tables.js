@@ -109,7 +109,7 @@ $(function() {
 	var this_row = $(this).parent().parent();
 	// Selected item
 	var codename = this_row.find('td:nth-child(2)').text();
-	var orgname = this_row.find('td:nth-child(5)').text();
+	var orgname = this_row.find('td:nth-child(6)').text();
 
 	if (localStorage.getItem(codename)) { 
 	    // Delete the item
@@ -140,7 +140,7 @@ $(function() {
 	    var each_row = each_icon.parent().parent();
 	    // Eech item
 	    var codename = each_row.find('td:nth-child(2)').text();
-	    var orgname = each_row.find('td:nth-child(5)').text();
+	    var orgname = each_row.find('td:nth-child(6)').text();
 
             if (selected) {
 		// Add the item
@@ -632,7 +632,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
           assembly_url = 'https://ncbi.nlm.nih.gov/assembly/' + assembly;
         }
 	    var sign = "plus";
-	    if (localStorage.getItem(mbgd_code)) {
+	    if (localStorage.getItem(up_id)) {
 		  sign = "minus";
 	    }
 	    var button = '<button type="button" class="add_genome" title="Select">'+
@@ -695,7 +695,10 @@ function show_selected_genome() {
 
     var total = 0;
     for (var i=0; i<localStorage.length; i++) {
+	  var key = localStorage.key(i);
+      if (key.startsWith('UP0')) {
     	total++;
+      }
     }
 
     if (total == 0) {
