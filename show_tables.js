@@ -583,33 +583,77 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
       var list_html = '<thead><tr>' + '<th align="center"><button type="button" class="add_genome_all" title="Select all">'+
 	    '<img src="img/plus.png" border="0" height="15" width="15"></button></th>' +
 	    '<th>Proteome ID</th>' +
+	    '<th>Assembly ID</th>' +
 	    '<th>Tax ID</th>' +
 	    '<th>Code</th>' +
-	    '<th>Species Name</th><th>Proteins</th>' +
-	    '<th>CPD</th>' +
-	    '<th>BUSCO</th>' +
+	    '<th>Species Name</th>' +
+	    '<th>Proteins</th>' +
+	    '<th>Isoforms</th>' +
+	    '<th>CPD <a href="https://uniprot.org/help/assessing_proteomes" target="_blank">*</a></th>' +
+	    '<th class="thin">avg.</th>' +
+	    '<th class="thin">stdev</th>' +
+	    '<th>BUSCO <a href="https://uniprot.org/help/assessing_proteomes" target="_blank">*</a></th>' +
+	    '<th class="thin">single</th>' +
+	    '<th class="thin">dupli.</th>' +
+	    '<th class="thin">frag.</th>' +
+	    '<th class="thin">miss.</th>' +
 	    // '<th align="center">Release date</th><th>Reference</th>' +
 	    '</tr></thead>';
 	  for (var i=0; i<count; i++) {
+	    var up_id = data_p[i]['proteome']['value'].replace(/.*\//, '');
 	    var mbgd_code = data_p[i]['code']['value'];
 	    var organism_name = data_p[i]['organism']['value'];
 	    data_p[i]['taxid']['value'].match(/(\d+)$/);
 	    var genome_taxid = RegExp.$1;
+        var busco_complete = '';
+        if (data_p[i]['busco_complete']) {
+          busco_complete = data_p[i]['busco_complete']['value'];
+        }
+        var busco_single = '';
+        if (data_p[i]['busco_single']) {
+          busco_single = data_p[i]['busco_single']['value'];
+        }
+        var busco_multi = '';
+        if (data_p[i]['busco_multi']) {
+          busco_multi = data_p[i]['busco_multi']['value'];
+        }
+        var busco_fragmented = '';
+        if (data_p[i]['busco_fragmented']) {
+          busco_fragmented = data_p[i]['busco_fragmented']['value'];
+        }
+        var busco_missing = '';
+        if (data_p[i]['busco_missing']) {
+          busco_missing = data_p[i]['busco_missing']['value'];
+        }
+        var assembly = '';
+        var assembly_url = '';
+        if (data_p[i]['assembly']) {
+          assembly = data_p[i]['assembly']['value'];
+          assembly_url = 'https://ncbi.nlm.nih.gov/assembly/' + assembly;
+        }
 	    var sign = "plus";
 	    if (localStorage.getItem(mbgd_code)) {
-		sign = "minus";
+		  sign = "minus";
 	    }
 	    var button = '<button type="button" class="add_genome" title="Select">'+
 	    	'<img src="img/'+ sign +'.png" border="0" height="15" width="15"></button>';
 	    list_html += '<tr>';
 	    list_html += '<td align="center">' + button + '</td>';
-	    list_html += '<td><a href="' + data_p[i]['proteome']['value'] + '" target="_blank">' + data_p[i]['id']['value'] + '</a></td>';
+	    list_html += '<td><a href="' + data_p[i]['proteome']['value'] + '" target="_blank">' + up_id + '</a></td>';
+	    list_html += `<td><a href="${assembly_url}" target="_blank">${assembly}</a></td>`;
 	    list_html += '<td>' + genome_taxid + '</td>';
 	    list_html += '<td>' + mbgd_code + '</td>';
 	    list_html += '<td class="genome_name"><i>' + organism_name + '</i></td>';
 	    list_html += '<td align="right">' + data_p[i]['proteins']['value'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+	    list_html += '<td align="right">' + data_p[i]['isoforms']['value'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+	    list_html += '<td align="right">' + data_p[i]['cpd_label']['value'] + '</td>';
 	    list_html += '<td align="right">' + data_p[i]['cpd_average']['value'] + '</td>';
-	    list_html += '<td align="right">' + data_p[i]['busco_complete']['value'] + '</td>';
+	    list_html += '<td align="right">' + data_p[i]['cpd_stddev']['value'].toString().replace(/\..*/, '') + '</td>';
+	    list_html += '<td align="right">' + busco_complete + '</td>';
+	    list_html += '<td align="right">' + busco_single + '</td>';
+	    list_html += '<td align="right">' + busco_multi + '</td>';
+	    list_html += '<td align="right">' + busco_fragmented + '</td>';
+	    list_html += '<td align="right">' + busco_missing + '</td>';
 	    // data_p[i]['date']['value'].match(/^([\d\-]+)/);
 	    // var date = RegExp.$1;
 	    // list_html += '<td align="center">'+date+'</td><td>';
