@@ -17,14 +17,11 @@ table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 }
 table.tablesorter thead tr .header {
 	font-family:Arial;
-	background-image: url(bg_b.gif);
-	background-repeat: no-repeat;
-	background-position: center right;
-	cursor: pointer;
+	cursor: row-resize;
 }
 table.tablesorter tbody td {
-        border: 1px #E3E3E3 solid;
-        border-width: 0 0 1px 1px;          
+    border: 1px #E3E3E3 solid;
+    border-width: 0 0 1px 1px;
 	padding: 1px;
 	vertical-align: top;
 }
@@ -32,13 +29,15 @@ table.tablesorter tbody tr.odd td {
 	background-color:#F0F0F6;
 }
 table.tablesorter thead tr .headerSortUp {
-	background-image: url(asc_b.gif);
+    /* background-color: cornsilk; */
+    background-color: linen;
+    /* background-color: seashell; */
 }
 table.tablesorter thead tr .headerSortDown {
-	background-image: url(desc_b.gif);
+    background-color: beige;
 }
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-background-color: #8fbc8f;
+    /* background-color: #8fbc8f; */
 }
 
 #dbpedia {

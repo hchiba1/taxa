@@ -560,9 +560,9 @@ function show_specific_genes(taxid) {
 
 function show_genome_list(rank, taxon_name, taxid, genome_type) {
 
-    var count = 0;
+  var count = 0;
 
-    $.getJSON('sparql_search.php?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+  $.getJSON('sparql_search.php?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
 	  var data_p = data['results']['bindings'];
 	  count = data_p.length;
       
@@ -666,33 +666,29 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	}
 	$('#details').html(list_html)
 	$(function() {
-	    $.tablesorter.addParser({
+	  $.tablesorter.addParser({
 		id: "fancyNumber",
 		is: function(s) {
-		    return /^[0-9]?[0-9,\.]*$/.test(s);
+		  return /^[0-9]?[0-9,\.]*$/.test(s);
 		},
 		format: function(s) {
-		    return $.tablesorter.formatFloat(s.replace(/,/g, ''));
+		  return $.tablesorter.formatFloat(s.replace(/,/g, ''));
 		},
 		type: "numeric"
-	    });
-	    $('#details').tablesorter(
+	  });
+	  $('#details').tablesorter(
 		{
-		    headers: {
+		  headers: {
 			0: {sorter:false},
-			1: {sorter:false},
-			2: {sorter:false},
-			4: {sorter:'fancyNumber'},
-			5: {sorter:'fancyNumber'},
-			7: {sorter:false},
-			8: {sorter:false}
-		    }
+			6: {sorter:'fancyNumber'},
+			7: {sorter:'fancyNumber'},
+		  }
 		}
-	    );
+	  );
 	});
-    });
+  });
 
-    return count;
+  return count;
 }
 
 function show_selected_genome() {
