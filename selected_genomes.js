@@ -24,40 +24,40 @@ $(function() {
     });
 
     $(document).on('click', '.add_genome_all', function() {
-	// Swith the icon
-	if ($(this).children('img').attr('src') == 'img/plus.png') {
+	  // Swith the icon
+	  if ($(this).children('img').attr('src') == 'img/plus.png') {
 	    $(this).children('img').attr('src','img/minus.png');
 	    var selected = 1;
-	} else {
+	  } else {
 	    $(this).children('img').attr('src','img/plus.png');
 	    var selected = 0;
-	}
-	
-        for (var i=0; i<$('.add_genome').length; i++) {
+	  }
+
+      for (var i=0; i<$('.add_genome').length; i++) {
 	    var each_icon = $('.add_genome').eq(i);
 	    var each_row = each_icon.parent().parent();
 	    // Eech item
 	    var codename = each_row.find('td:nth-child(2)').text();
 	    var orgname = each_row.find('td:nth-child(3)').text();
 
-            if (selected) {
-		// Add the item
-                if (! localStorage.getItem(codename)) {
+        if (selected) {
+		  // Add the item
+          if (! localStorage.getItem(codename)) {
 		    localStorage.setItem(codename, orgname);
-		}
-		// Swith the icon
-                each_icon.children('img').attr('src','img/minus.png');
-            } else {
-		// Delete the item
-                if (localStorage.getItem(codename)) {
+		  }
+		  // Swith the icon
+          each_icon.children('img').attr('src','img/minus.png');
+        } else {
+		  // Delete the item
+          if (localStorage.getItem(codename)) {
 		    localStorage.removeItem(codename);
-		}
-		// Swith the icon
-                each_icon.children('img').attr('src','img/plus.png');
-            }
-	}
+		  }
+		  // Swith the icon
+          each_icon.children('img').attr('src','img/plus.png');
+        }
+	  }
 
-	show_selected_genomes();
+	  show_selected_genomes();
     });
 
 });
@@ -73,14 +73,17 @@ function show_selected_genomes() {
 	'</tr><thead>';
   var button = '<button type="button" class="add_genome" title="Select">'+
 	'<img src="img/'+ 'minus' +'.png" border="0" height="15" width="15"></button>';
+  
   for (var i=0; i<localStorage.length; i++) {
 	var key = localStorage.key(i);
-	var val = localStorage.getItem(key);
-	html += '<tr>';
-	html += '<td align="center">' + button + '</td>';
-    html += '<td>' + key + '</td><td><i>' + val + '</i></td>';
-	html += '</tr>';
-	total++;
+    if (key.startsWith('UP0')) {
+	  var val = localStorage.getItem(key);
+	  html += '<tr>';
+	  html += '<td align="center">' + button + '</td>';
+      html += '<td>' + key + '</td><td><i>' + val + '</i></td>';
+	  html += '</tr>';
+	  total++;
+    }
   }
   html += '';
   
