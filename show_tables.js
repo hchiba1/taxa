@@ -597,7 +597,6 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	    '<th class="thin">dupli.</th>' +
 	    '<th class="thin">frag.</th>' +
 	    '<th class="thin">miss.</th>' +
-	    // '<th align="center">Release date</th><th>Reference</th>' +
 	    '</tr></thead>';
 	  for (var i=0; i<count; i++) {
 	    var up_id = data_p[i]['proteome']['value'].replace(/.*\//, '');
@@ -605,40 +604,20 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	    var organism_name = data_p[i]['organism']['value'];
 	    data_p[i]['taxid']['value'].match(/(\d+)$/);
 	    var genome_taxid = RegExp.$1;
-        var busco_complete = '';
-        if (data_p[i]['busco_complete']) {
-          busco_complete = data_p[i]['busco_complete']['value'];
-        }
-        var busco_single = '';
-        if (data_p[i]['busco_single']) {
-          busco_single = data_p[i]['busco_single']['value'];
-        }
-        var busco_multi = '';
-        if (data_p[i]['busco_multi']) {
-          busco_multi = data_p[i]['busco_multi']['value'];
-        }
-        var busco_fragmented = '';
-        if (data_p[i]['busco_fragmented']) {
-          busco_fragmented = data_p[i]['busco_fragmented']['value'];
-        }
-        var busco_missing = '';
-        if (data_p[i]['busco_missing']) {
-          busco_missing = data_p[i]['busco_missing']['value'];
-        }
-        var assembly = '';
+        var busco_complete = data_p[i]['busco_complete'] ? data_p[i]['busco_complete']['value'] : '';
+        var busco_single = data_p[i]['busco_single'] ? data_p[i]['busco_single']['value'] : '';
+        var busco_multi = data_p[i]['busco_multi'] ? data_p[i]['busco_multi']['value'] : '';
+        var busco_fragmented = data_p[i]['busco_fragmented'] ? data_p[i]['busco_fragmented']['value'] : '';
+        var busco_missing = data_p[i]['busco_missing'] ? data_p[i]['busco_missing']['value'] : '';
+        var assembly = data_p[i]['assembly'] ? data_p[i]['assembly']['value'] : '';
         var assembly_url = '';
-        if (data_p[i]['assembly']) {
-          assembly = data_p[i]['assembly']['value'];
+        if (assembly) {
           assembly_url = 'https://ncbi.nlm.nih.gov/assembly/' + assembly;
         }
-	    var sign = "plus";
-	    if (localStorage.getItem(up_id)) {
-		  sign = "minus";
-	    }
-	    var button = '<button type="button" class="add_genome" title="Select">'+
-	    	'<img src="img/'+ sign +'.png" border="0" height="15" width="15"></button>';
+	    var sign_png = localStorage.getItem(up_id) ? 'img/minus.png' : 'img/plus.png';
+	    var button_img = '<img src="' + sign_png + '" border="0" height="15" width="15">';
 	    list_html += '<tr>';
-	    list_html += '<td align="center">' + button + '</td>';
+	    list_html += '<td align="center"><button type="button" class="add_genome" title="Select">' + button_img + '</button></td>';
 	    list_html += '<td><a href="' + data_p[i]['proteome']['value'] + '" target="_blank">' + up_id + '</a></td>';
 	    list_html += `<td><a href="${assembly_url}" target="_blank">${assembly}</a></td>`;
 	    list_html += '<td>' + genome_taxid + '</td>';
@@ -654,14 +633,6 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	    list_html += '<td align="right">' + busco_multi + '</td>';
 	    list_html += '<td align="right">' + busco_fragmented + '</td>';
 	    list_html += '<td align="right">' + busco_missing + '</td>';
-	    // data_p[i]['date']['value'].match(/^([\d\-]+)/);
-	    // var date = RegExp.$1;
-	    // list_html += '<td align="center">'+date+'</td><td>';
-	    // if (data_p[i]['pubmed']) {
-		// data_p[i]['pubmed']['value'].match(/(\d+)$/);
-		// var pmid = RegExp.$1;
-		// list_html += '<a href="' + data_p[i]['pubmed']['value'] + '" target="_blank">pmid:' + pmid + '</a>';
-	    // }
 	    list_html += '</td></tr>';
 	}
 	$('#details').html(list_html)
