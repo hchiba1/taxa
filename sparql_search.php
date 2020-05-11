@@ -144,7 +144,7 @@ WHERE {
   }
 }
 ORDER BY ?depth ?label
-    ';
+  ';
     echo curlRequest($ortho_endpoint . urlencode($query));
 
 
@@ -253,10 +253,11 @@ PREFIX upTax: <http://purl.uniprot.org/taxonomy/>
 PREFIX taxid: <http://identifiers.org/taxonomy/>
 PREFIX busco: <htttp://busco.ezlab.org/schema#>
 
-SELECT DISTINCT ?proteome ?taxid ?code ?organism ?proteins ?isoforms ?cpd_average ?cpd_stddev ?cpd_label ?busco_complete ?busco_single ?busco_multi ?busco_fragmented ?busco_missing ?assembly
+SELECT DISTINCT ?proteome ?taxid ?code ?organism ?proteins ?isoforms ?cpd_average ?cpd_stddev ?cpd_label ?busco_complete ?busco_single ?busco_multi ?busco_fragmented ?busco_missing ?assembly (group_concat(distinct ?type ; separator = ", ") AS ?types)
 WHERE {
   ?taxid rdfs:subClassOf? upTax:' . $_GET["taxon_to_search_genomes"] . ' .
   ?proteome a up:Proteome ;
+      a ?type ;
       up:oscode ?code ;
       rdfs:label ?organism ;
       up:proteins ?proteins ;

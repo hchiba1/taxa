@@ -106,63 +106,61 @@ $(function() {
 
     // Manipulate the genome "cart"
     $(document).on('click', '.add_genome', function() {
-	var this_row = $(this).parent().parent();
-	// Selected item
-	var codename = this_row.find('td:nth-child(2)').text();
-	var orgname = this_row.find('td:nth-child(6)').text();
+	  var this_row = $(this).parent().parent();
+	  // Selected item
+	  var proteome_id = this_row.find('td:nth-child(2)').text();
+	  var orgname = this_row.find('td:nth-child(6)').text();
 
-	if (localStorage.getItem(codename)) { 
+	  if (localStorage.getItem(proteome_id)) {
 	    // Delete the item
-	    localStorage.removeItem(codename);
+	    localStorage.removeItem(proteome_id);
 	    $(this).children('img').attr('src', 'img/plus.png');
-	} else {         
+	  } else {
 	    // Add the item
-	    localStorage.setItem(codename, orgname);
+	    localStorage.setItem(proteome_id, orgname);
 	    $(this).children('img').attr('src', 'img/minus.png');
-	}
+	  }
 
-	// Draw table
-        show_selected_genome();
+	  // Draw table
+      show_selected_genome();
     });
 
-    $(document).on('click', '.add_genome_all', function() {
+  $(document).on('click', '.add_genome_all', function() {
 	// Swith the icon
 	if ($(this).children('img').attr('src') == 'img/plus.png') {
-	    $(this).children('img').attr('src','img/minus.png');
-	    var selected = 1;
+	  $(this).children('img').attr('src','img/minus.png');
+	  var selected = 1;
 	} else {
-	    $(this).children('img').attr('src','img/plus.png');
-	    var selected = 0;
+	  $(this).children('img').attr('src','img/plus.png');
+	  var selected = 0;
 	}
-	
-        for (var i=0; i<$('.add_genome').length; i++) {
-	    var each_icon = $('.add_genome').eq(i);
-	    var each_row = each_icon.parent().parent();
-	    // Eech item
-	    var codename = each_row.find('td:nth-child(2)').text();
-	    var orgname = each_row.find('td:nth-child(6)').text();
-
-            if (selected) {
+    for (var i=0; i<$('.add_genome').length; i++) {
+	  var each_icon = $('.add_genome').eq(i);
+	  var each_row = each_icon.parent().parent();
+	  // Eech item
+	  var proteome_id = each_row.find('td:nth-child(2)').text();
+	  var orgname = each_row.find('td:nth-child(6)').text();
+      
+      if (selected) {
 		// Add the item
-                if (! localStorage.getItem(codename)) {
-		    localStorage.setItem(codename, orgname);
+        if (! localStorage.getItem(proteome_id)) {
+		  localStorage.setItem(proteome_id, orgname);
 		}
 		// Swith the icon
-                each_icon.children('img').attr('src','img/minus.png');
-            } else {
+        each_icon.children('img').attr('src','img/minus.png');
+      } else {
 		// Delete the item
-                if (localStorage.getItem(codename)) {
-		    localStorage.removeItem(codename);
+        if (localStorage.getItem(proteome_id)) {
+		  localStorage.removeItem(proteome_id);
 		}
 		// Swith the icon
-                each_icon.children('img').attr('src','img/plus.png');
-            }
+        each_icon.children('img').attr('src','img/plus.png');
+      }
 	}
-
+    
 	// Draw table
-        show_selected_genome();
-    });
-
+    show_selected_genome();
+  });
 });
 
 function show_contents(taxon_name) {
@@ -583,9 +581,9 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
       var list_html = '<thead><tr>' + '<th align="center"><button type="button" class="add_genome_all" title="Select all">'+
 	    '<img src="img/plus.png" border="0" height="15" width="15"></button></th>' +
 	    '<th>Proteome ID</th>' +
-	    '<th>Assembly ID</th>' +
+	    '<th>Genome</th>' +
 	    '<th>Tax ID</th>' +
-	    '<th>Code</th>' +
+	    '<th>Ref.</th>' +
 	    '<th>Species Name</th>' +
 	    '<th>Proteins</th>' +
 	    '<th>Isoforms</th>' +
@@ -600,7 +598,15 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	    '</tr></thead>';
 	  for (var i=0; i<count; i++) {
 	    var up_id = data_p[i]['proteome']['value'].replace(/.*\//, '');
-	    var mbgd_code = data_p[i]['code']['value'];
+        let types = data_p[i]['types']['value'];
+        let proteome_types = '';
+        if (types.match(/Reference_Proteome/)) {
+          // proteome_types += 'Reference';
+          proteome_types += '&#9675';
+        }
+        // if (types.match(/Representative_Proteome/)) {
+        //   proteome_types += ' Representative';
+        // }
 	    var organism_name = data_p[i]['organism']['value'];
 	    data_p[i]['taxid']['value'].match(/(\d+)$/);
 	    var genome_taxid = RegExp.$1;
@@ -621,7 +627,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	    list_html += '<td><a href="' + data_p[i]['proteome']['value'] + '" target="_blank">' + up_id + '</a></td>';
 	    list_html += `<td><a href="${assembly_url}" target="_blank">${assembly}</a></td>`;
 	    list_html += '<td>' + genome_taxid + '</td>';
-	    list_html += '<td>' + mbgd_code + '</td>';
+	    list_html += '<td>' + proteome_types + '</td>';
 	    list_html += '<td class="genome_name"><i>' + organism_name + '</i></td>';
 	    list_html += '<td align="right">' + data_p[i]['proteins']['value'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
 	    list_html += '<td align="right">' + data_p[i]['isoforms']['value'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
