@@ -678,13 +678,13 @@ function show_selected_genome() {
       }
     }
 
-    if (total == 0) {
-	  $("#selected_genome").html('');
-      $("#selected_genome").css("background-color", "transparent");
-    } else {
+    // if (total == 0) {
+	//   $("#selected_genome").html('');
+    //   $("#selected_genome").css("background-color", "transparent");
+    // } else {
 	  var html = '<tr><td id="selected_genome_num"><font size="2">You selected <b>' + total + '</b> proteomes</font></td>' +
         '<td><a href="selected_genomes.html" target="_blank" class="btn">Check</a></td></tr>';
 	  $("#selected_genome").html(html);
       $("#selected_genome").css("background-color", "#d6d6d6");
-    }
+    // }
 }
