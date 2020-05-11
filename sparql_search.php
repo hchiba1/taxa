@@ -253,21 +253,20 @@ PREFIX upTax: <http://purl.uniprot.org/taxonomy/>
 PREFIX taxid: <http://identifiers.org/taxonomy/>
 PREFIX busco: <htttp://busco.ezlab.org/schema#>
 
-SELECT DISTINCT ?proteome ?taxid ?code ?organism ?proteins ?isoforms ?cpd_average ?cpd_stddev ?cpd_label ?busco_complete ?busco_single ?busco_multi ?busco_fragmented ?busco_missing ?assembly (group_concat(distinct ?type ; separator = ", ") AS ?types)
+SELECT DISTINCT ?proteome ?taxid ?organism ?proteins ?isoforms ?cpd_label ?busco_complete ?busco_single ?busco_multi ?busco_fragmented ?busco_missing ?assembly (group_concat(distinct ?type ; separator = ", ") AS ?types)
 WHERE {
   ?taxid rdfs:subClassOf? upTax:' . $_GET["taxon_to_search_genomes"] . ' .
   ?proteome a up:Proteome ;
       a ?type ;
-      up:oscode ?code ;
       rdfs:label ?organism ;
       up:proteins ?proteins ;
       up:isoforms ?isoforms ;
       skos:closeMatch/rdfs:label ?cpd_label ;
       up:organism ?taxid .
-  BIND(URI(CONCAT(?proteome, "#cpd-average")) AS ?cpd_average_uri)
-  ?cpd_average_uri rdf:value ?cpd_average .
-  BIND(URI(CONCAT(?proteome, "#cpd-stddev")) AS ?cpd_stddev_uri)
-  ?cpd_stddev_uri rdf:value ?cpd_stddev .
+#  BIND(URI(CONCAT(?proteome, "#cpd-average")) AS ?cpd_average_uri)
+#  ?cpd_average_uri rdf:value ?cpd_average .
+#  BIND(URI(CONCAT(?proteome, "#cpd-stddev")) AS ?cpd_stddev_uri)
+#  ?cpd_stddev_uri rdf:value ?cpd_stddev .
   OPTIONAL {
     ?proteome busco:has_score ?busco .
     ?busco busco:complete ?busco_complete .
