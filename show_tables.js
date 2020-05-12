@@ -604,7 +604,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 	count = data_p.length;
 
     let list_html = '';
-    let count_selected_rows = '';
+    let count_selected_rows = 0;
     let count_reference = 0;
 	for (var i=0; i<count; i++) {
 	  data_p[i]['taxid']['value'].match(/(\d+)$/);
@@ -707,18 +707,14 @@ function show_selected_genome() {
       }
     }
 
-    // if (total == 0) {
-	//   $("#selected_genome").html('');
-    //   $("#selected_genome").css("background-color", "transparent");
-    // } else {
-	  var html = '<tr>'+
+  var html = '<tr>' +
     '<td id="selected_genome_num"><font size="2">You selected <b>' + total + '</b> proteomes</font></td>' +
-        '<td><a href="selected_genomes.html" target="_blank" class="btn">Check</a></td>' +
-    '<td><input type="button" class="btn" style="font-size:13;background:#c93a40" value="Clear" onClick="clearLocalStorage()"/>' +
+    '<td><a href="selected_genomes.html" target="_blank" class="btn">Check</a></td>' +
+    '<td width="5px"></td>' +
+    '<td><input type="button" class="btn" style="font-size:13px;background:#c93a40" value="Clear" onClick="clearLocalStorage()"/>' +
     '</tr>';
-	  $("#selected_genome").html(html);
-      $("#selected_genome").css("background-color", "#d6d6d6");
-    // }
+  $("#selected_genome").html(html);
+  $("#selected_genome").css("background-color", "#d6d6d6");
 }
 
 function clearLocalStorage() {
