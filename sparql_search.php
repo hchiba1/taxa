@@ -99,7 +99,7 @@ PREFIX upTax: <http://purl.uniprot.org/taxonomy/>
 PREFIX taxid: <http://identifiers.org/taxonomy/>
 PREFIX ortho: <https://orth.dbcls.jp/rdf/ontology#>
 
-SELECT ?rank ?label ?taxon (COUNT(?proteome) AS ?count)
+SELECT DISTINCT ?rank ?label ?taxon ?count
 WHERE {
   upTax:' . $_GET["taxid_to_get_upper"] . ' rdfs:subClassOf ?taxon .
   ?taxon up:scientificName ?label ;
