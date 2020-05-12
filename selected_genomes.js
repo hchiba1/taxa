@@ -7,7 +7,7 @@ $(function() {
     $(document).on('click', '.add_genome', function() {
 	var this_row = $(this).parent().parent();
 	// Selected item
-	var codename = this_row.find('td:nth-child(4)').text();
+	var codename = this_row.find('td:nth-child(3)').text();
 	var orgname = this_row.find('td:nth-child(7)').text();
 
 	if (localStorage.getItem(codename)) { 
@@ -37,7 +37,7 @@ $(function() {
 	    var each_icon = $('.add_genome').eq(i);
 	    var each_row = each_icon.parent().parent();
 	    // Eech item
-	    var codename = each_row.find('td:nth-child(4)').text();
+	    var codename = each_row.find('td:nth-child(3)').text();
 	    var orgname = each_row.find('td:nth-child(7)').text();
 
         if (selected) {

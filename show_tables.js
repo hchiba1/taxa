@@ -110,7 +110,7 @@ $(function() {
     $(document).on('click', '.add_genome', function() {
 	  var this_row = $(this).parent().parent();
 	  // Selected item
-	  var proteome_id = this_row.find('td:nth-child(4)').text();
+	  var proteome_id = this_row.find('td:nth-child(3)').text();
 	  // var orgname = this_row.find('td:nth-child(7)').text();
 	  var orgname = $(this).closest('tr').html();
 
@@ -141,7 +141,7 @@ $(function() {
 	  var each_icon = $('.add_genome').eq(i);
 	  var each_row = each_icon.parent().parent();
 	  // Eech item
-	  var proteome_id = each_row.find('td:nth-child(4)').text();
+	  var proteome_id = each_row.find('td:nth-child(3)').text();
 	  // var orgname = each_row.find('td:nth-child(7)').text();
 	  var orgname = each_icon.closest('tr').html();
       
@@ -566,11 +566,11 @@ function get_table_row(up_id_url, up_id, types, organism_name, genome_taxid, n_g
   } else {
     list_html += '<td> </td>';
   }
-  if (types.match(/Representative_Proteome/)) {
-    list_html += '<td align="center"> &#9675 </td>';
-  } else {
-    list_html += '<td> </td>';
-  }
+  // if (types.match(/Representative_Proteome/)) {
+  //   list_html += '<td align="center"> &#9675 </td>';
+  // } else {
+  //   list_html += '<td> </td>';
+  // }
   list_html += `<td><a href="${up_id_url}" target="_blank">${up_id}</a></td>`;
   list_html += `<td><a href="${assembly_url}" target="_blank">${assembly}</a></td>`;
   list_html += '<td>' + genome_taxid + '</td>';
@@ -633,7 +633,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
       '<th align="center"><button type="button" class="add_genome_all" title="Select all">' +
       `<img src="${header_button_img}" border="0" height="15" width="15">` + '</button></th>' +
 	  '<th>Ref</th>' +
-	  '<th>Rep</th>' +
+	  // '<th>Rep</th>' +
 	  '<th>Proteome ID</th>' +
 	  '<th>Genome ID</th>' +
 	  '<th>Tax ID</th>' +
@@ -679,8 +679,8 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 		{
 		  headers: {
 			0: {sorter:false},
+			6: {sorter:'fancyNumber'},
 			7: {sorter:'fancyNumber'},
-			8: {sorter:'fancyNumber'},
 		  }
 		}
 	  );
