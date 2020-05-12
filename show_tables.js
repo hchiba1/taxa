@@ -8,7 +8,7 @@ function init() {
 
     haystack = [];
     $.ajaxSetup({ async: false });
-    $.getJSON('sparql_search.php?genome_type=' + genome_type, function(data) {
+    $.getJSON('/taxa/sparql_search.php?genome_type=' + genome_type, function(data) {
     	for (key in data) {
     	    haystack.push(key);
     	}
@@ -177,7 +177,7 @@ function show_contents(taxon_name) {
     // Get tax ID
     var taxid;
     var rank;
-    $.getJSON('sparql_search.php?sci_name=' + taxon_name + '&genome_type_to_search=' + genome_type, function(data) {
+    $.getJSON('/taxa/sparql_search.php?sci_name=' + taxon_name + '&genome_type_to_search=' + genome_type, function(data) {
 	data['results']['bindings'][0]['taxon']['value'].match(/(\d+)$/);
 	taxid = RegExp.$1;
 	rank = data['results']['bindings'][0]['rank']['value'].replace(/.*\//, '');
@@ -267,7 +267,7 @@ function show_hierarchy(taxid, genome_type, lang) {
 
     var table_upper = [];
     var list = ''; 
-    $.getJSON('sparql_search.php?taxid_to_get_upper=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+    $.getJSON('/taxa/sparql_search.php?taxid_to_get_upper=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
 	var data_p = data['results']['bindings'];
 	for (var i=0; i<data_p.length; i++) {
 	    table_upper[i] = data_p[i];
@@ -280,7 +280,7 @@ function show_hierarchy(taxid, genome_type, lang) {
     });
 
     var table_lower = [];
-    $.getJSON('sparql_search.php?taxid_to_get_lower=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+    $.getJSON('/taxa/sparql_search.php?taxid_to_get_lower=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
     	var data_p = data['results']['bindings'];
     	for (var i=0; i<data_p.length; i++) {
     	    table_lower[i] = data_p[i];
@@ -293,7 +293,7 @@ function show_hierarchy(taxid, genome_type, lang) {
     });
 
     var table_sister = [];
-    $.getJSON('sparql_search.php?taxid_to_get_sisters=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+    $.getJSON('/taxa/sparql_search.php?taxid_to_get_sisters=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
       var data_p = data['results']['bindings'];
       for (var i=0; i<data_p.length; i++) {
     	table_sister[i] = data_p[i];
@@ -308,7 +308,7 @@ function show_hierarchy(taxid, genome_type, lang) {
     // Use DBpedia to translate
     var dbpedia_labe_en = {};
     var dbpedia_labe_local = {};
-    $.getJSON('sparql_search.php?tax_list_to_get_local=' + list + '&local_lang=' + lang, function(data) {
+    $.getJSON('/taxa/sparql_search.php?tax_list_to_get_local=' + list + '&local_lang=' + lang, function(data) {
     	var data_p = data['results']['bindings'];
     	for (var i=0; i<data_p.length; i++) {
 	    var dbpedia_uri = data_p[i]['dbpedia_resource']['value'];
@@ -437,7 +437,7 @@ function show_dbpedia(taxon_name, taxid, local_lang) {
 	return;
     }
     
-    $.getJSON('sparql_search.php?dbpedia_entry=' + dbpedia.uri + '&local_lang=' + local_lang, function(data) {
+    $.getJSON('/taxa/sparql_search.php?dbpedia_entry=' + dbpedia.uri + '&local_lang=' + local_lang, function(data) {
 	var data_p = data['results']['bindings'];
 	var img = '';
 	var abst = '';
@@ -502,7 +502,7 @@ function show_genome_comparison(taxid) {
     var mbgd_page = '/htbin/cluster_map?show_summary=on&map_type=cluster_size&tabid=';
 
     var count_compared = 0;
-    $.getJSON('sparql_search.php?taxid_to_get_dataset=' + taxid, function(data) {
+    $.getJSON('/taxa/sparql_search.php?taxid_to_get_dataset=' + taxid, function(data) {
 	var data_p = data['results']['bindings'];
 	for (var i=0; i<data_p.length; i++) {
     	    count_compared = data_p[i]['count']['value'];
@@ -532,7 +532,7 @@ function show_genome_comparison(taxid) {
 
 function show_specific_genes(taxid) {
 
-    $.getJSON('sparql_search.php?taxon_to_default_orgs=' + taxid, function(data) {
+    $.getJSON('/taxa/sparql_search.php?taxon_to_default_orgs=' + taxid, function(data) {
       var data_p = data['results']['bindings'];
 	  var count_default = 0;
       for (var i=0; i<data_p.length; i++) {
@@ -599,7 +599,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 
   var count = 0;
 
-  $.getJSON('sparql_search.php?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+  $.getJSON('/taxa/sparql_search.php?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
 	var data_p = data['results']['bindings'];
 	count = data_p.length;
 
@@ -711,9 +711,18 @@ function show_selected_genome() {
 	//   $("#selected_genome").html('');
     //   $("#selected_genome").css("background-color", "transparent");
     // } else {
-	  var html = '<tr><td id="selected_genome_num"><font size="2">You selected <b>' + total + '</b> proteomes</font></td>' +
-        '<td><a href="selected_genomes.html" target="_blank" class="btn">Check</a></td></tr>';
+	  var html = '<tr>'+
+    '<td id="selected_genome_num"><font size="2">You selected <b>' + total + '</b> proteomes</font></td>' +
+        '<td><a href="selected_genomes.html" target="_blank" class="btn">Check</a></td>' +
+    '<td><input type="button" class="btn" style="font-size:13;background:#c93a40" value="Clear" onClick="clearLocalStorage()"/>' +
+    '</tr>';
 	  $("#selected_genome").html(html);
       $("#selected_genome").css("background-color", "#d6d6d6");
     // }
+}
+
+function clearLocalStorage() {
+  localStorage.clear();
+  $("#details").find('img').attr('src', 'img/plus.png');
+  show_selected_genome();
 }
