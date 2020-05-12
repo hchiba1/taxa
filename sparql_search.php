@@ -99,17 +99,21 @@ PREFIX upTax: <http://purl.uniprot.org/taxonomy/>
 PREFIX taxid: <http://identifiers.org/taxonomy/>
 PREFIX ortho: <https://orth.dbcls.jp/rdf/ontology#>
 
-SELECT ?depth ?rank ?label ?taxon (COUNT(?proteome) AS ?count)
+SELECT ?rank ?label ?taxon (COUNT(?proteome) AS ?count)
 WHERE {
-  ?taxon rdfs:seeAlso ?up_taxon .
-  upTax:' . $_GET["taxid_to_get_upper"] . ' rdfs:subClassOf ?up_taxon .
-  ?up_taxon up:rank ?rank ;
-      up:scientificName ?label .
+  upTax:' . $_GET["taxid_to_get_upper"] . ' rdfs:subClassOf ?taxon .
+  ?taxon up:scientificName ?label ;
+      up:rank ?rank .
   ?rank ortho:taxRankDepth ?depth .
-  ?proteome a up:Proteome ;
-      rdfs:label ?organism ;
-      up:organism ?up_taxid .
-  ?up_taxid rdfs:subClassOf ?up_taxon .
+  {
+    SELECT (COUNT(DISTINCT ?organism) AS ?count) ?taxon
+    WHERE {
+      ?proteome a up:Proteome ;
+          rdfs:label ?organism ;
+          up:organism ?up_taxid .
+      ?up_taxid rdfs:subClassOf ?taxon .
+    }
+  }
 }
 ORDER BY ?depth
   ';
@@ -173,7 +177,7 @@ WHERE {
       ?organism up:organism ?up_taxid ;
           rdfs:label ?org_label ;
           a up:Proteome .
-      ?up_taxid rdfs:subClassOf ?taxon .
+      ?up_taxid rdfs:subClassOf? ?taxon .
     }
   }
 }
