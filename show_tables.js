@@ -550,6 +550,13 @@ function get_table_row(up_id_url, up_id, types, organism_name, genome_taxid, n_g
   }
   var sign_png = localStorage.getItem(up_id) ? 'img/minus.png' : 'img/plus.png';
   var button_img = '<img src="' + sign_png + '" border="0" height="15" width="15">';
+  let scientific_name = organism_name;
+  let common_name = '';
+  if (organism_name.match(/(.*)?(\(.*)/)) {
+    scientific_name = RegExp.$1;
+    common_name = RegExp.$2;
+  }
+  let name = `<i>${scientific_name}</i> ${common_name}`;
 
   let list_html = '<tr>';
   list_html += '<td align="center"><button type="button" class="add_genome" title="Select">' + button_img + '</button></td>';
@@ -566,7 +573,7 @@ function get_table_row(up_id_url, up_id, types, organism_name, genome_taxid, n_g
   list_html += '<td><a href="' + up_id_url + '" target="_blank">' + up_id + '</a></td>';
   list_html += `<td><a href="${assembly_url}" target="_blank">${assembly}</a></td>`;
   list_html += '<td>' + genome_taxid + '</td>';
-  list_html += '<td class="genome_name"><i>' + organism_name + '</i></td>';
+  list_html += '<td class="genome_name">' + name + '</td>';
   list_html += '<td align="right">' + n_genes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
   list_html += '<td align="right">' + n_isoforms.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
   list_html += '<td align="right">' + cpd_label + '</td>';
