@@ -1,5 +1,7 @@
 var haystack = [];
 
+const sparql_search = '/ver/sparql_search.php';
+
 function init() {
     var genome_type = 'CompleteGenome';
     if($('#draft').prop('checked')) {
@@ -8,7 +10,7 @@ function init() {
 
     haystack = [];
     $.ajaxSetup({ async: false });
-    $.getJSON('/taxa/sparql_search.php?genome_type=' + genome_type, function(data) {
+    $.getJSON(sparql_search + '?genome_type=' + genome_type, function(data) {
     	for (key in data) {
     	    haystack.push(key);
     	}
@@ -167,267 +169,250 @@ $(function() {
 
 function show_contents(taxon_name) {
 
-    var lang = ((navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || navigator.browserLanguage).substr(0,2);
-    // var lang = 'en';
-    var genome_type = 'CompleteGenome';
-    if($('#draft').prop('checked')) {
+  var lang = ((navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || navigator.browserLanguage).substr(0,2);
+  // var lang = 'en';
+  var genome_type = 'CompleteGenome';
+  if($('#draft').prop('checked')) {
 	genome_type = 'Genome';
-    }
+  }
 
-    // Get tax ID
-    var taxid;
-    var rank;
-    $.getJSON('/taxa/sparql_search.php?sci_name=' + taxon_name + '&genome_type_to_search=' + genome_type, function(data) {
+  // Get tax ID
+  var taxid;
+  var rank;
+  $.getJSON(sparql_search + '?sci_name=' + taxon_name + '&genome_type_to_search=' + genome_type, function(data) {
 	data['results']['bindings'][0]['taxon']['value'].match(/(\d+)$/);
 	taxid = RegExp.$1;
 	rank = data['results']['bindings'][0]['rank']['value'].replace(/.*\//, '');
-    });
+  });
 
-    // Hide initial contents
-    $('#initial_input_label').text('');
+  // Hide initial contents
+  $('#initial_input_label').text('');
 
-    // Show logo and label
-    $('#further_input_label').html('Search Taxon: ');
+  // Show logo and label
+  $('#further_input_label').html('Search Taxon: ');
 
-    // Clear tables
-    $('#dbpedia_div').html('');
-    $('#genome_comparison_div').html('');
-    $('#specific_genes_div').html('');
-    $('#counter_div').html('');
-    $('#details').attr('border', '0');
-    $('#details').html('');
+  // Clear tables
+  $('#dbpedia_div').html('');
+  $('#genome_comparison_div').html('');
+  $('#specific_genes_div').html('');
+  $('#counter_div').html('');
+  $('#details').attr('border', '0');
+  $('#details').html('');
 
-    // Show main taxon name
-    var html = '<h3><i>' + taxon_name + '</i>';
-    html += ' (Taxonomy ID: ' + taxid + ')';
-    html += '</h3>';
-    $('#main_taxon_name_div').html(html);
-    
-    // Show tables
-    setTimeout(function(){    
-	  var count = show_hierarchy(taxid, genome_type, lang);
-	  var sub_html = '<font size="2"><b>';
-	  sub_html += '&emsp;Found ' + count;
-	  if (count == 1) {
-	    sub_html += ' proteome';
-	  } else {
-	    sub_html += ' proteomes';
-	  }
-	  if (genome_type != "CompleteGenome") {
-	    sub_html += ' including draft'
-	  }
-	  sub_html += '</b>';
-	  sub_html += '<br>';
-	  sub_html += '<br></font>';
-	  $('#sub_title_div').html(sub_html);
-    }, 0);
+  // Show main taxon name
+  var html = `<h3><i>${taxon_name}</i> (Taxonomy ID: ${taxid})</h3>`;
+  $('#main_taxon_name_div').html(html);
 
+  // Show tables
+  setTimeout(function(){
+	let count = show_hierarchy(taxid, genome_type, lang);
+    let count_unit = 'proteome';
+    if (count >= 2) {
+      count_unit = 'proteomes';
+    }
+	$('#sub_title_div').html(`<font size="2"><b>&emsp;Found ${count} ${count_unit}</b><br><br></font>`);
+  }, 0);
   setTimeout(function(){    
     show_dbpedia(taxon_name, taxid, lang);
   }, 0);
-
   setTimeout(function(){    
     show_genome_comparison(taxid);
   }, 0);
-
   setTimeout(function(){    
     show_specific_genes(taxid);
   }, 0);
-
   setTimeout(function(){    
 	show_genome_list(rank, taxon_name, taxid, genome_type);
 	$('#details').attr('border', '1');
   }, 0);
-
   show_selected_genome();
 }
 
 function dbpedia_name(taxon_name) {
 
-    if (taxon_name == 'Chania'
-	|| taxon_name == 'Nitrososphaeria'
-	|| taxon_name == 'Candidatus Korarchaeum cryptofilum') {
+  if (taxon_name == 'Chania'
+	  || taxon_name == 'Nitrososphaeria'
+	  || taxon_name == 'Candidatus Korarchaeum cryptofilum') {
 	return;
-    } else if (taxon_name == 'Proteus') {
+  } else if (taxon_name == 'Proteus') {
 	return { name: 'Proteus_(bacterium)', uri: '<http://dbpedia.org/resource/Proteus_(bacterium)>' };
-    }
+  } else if (taxon_name == 'Pan') {
+	return { name: 'Pan_(genus)', uri: '<http://dbpedia.org/resource/Pan_(genus)>' };
+  }
 
-    var dbpedia_name = taxon_name
-	    .replace(/\s/g, '_')
-	    .replace(/^Candidatus_/, '')
-	    .replace(/\//g, '_')
-	    .replace(/'/g, '')
-	    .replace(/\(/g, '_').replace(/\)/g, '_')
-	    .replace(/\[/g, '').replace(/\]/g, '');
+  var dbpedia_name = taxon_name
+	.replace(/\s/g, '_')
+	.replace(/^Candidatus_/, '')
+	.replace(/\//g, '_')
+	.replace(/'/g, '')
+	.replace(/\(/g, '_').replace(/\)/g, '_')
+	.replace(/\[/g, '').replace(/\]/g, '');
 
-    return { name: dbpedia_name, uri: 'dbpedia:' + dbpedia_name };
+  return { name: dbpedia_name, uri: 'dbpedia:' + dbpedia_name };
 }
 
 function show_hierarchy(taxid, genome_type, lang) {
 
-    var table_upper = [];
-    var list = ''; 
-    $.getJSON('/taxa/sparql_search.php?taxid_to_get_upper=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+  var list = '';
+  var table_upper = [];
+  var table_lower = [];
+  var table_sister = [];
+  $.getJSON(sparql_search + '?taxid_to_get_upper=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
 	var data_p = data['results']['bindings'];
 	for (var i=0; i<data_p.length; i++) {
-	    table_upper[i] = data_p[i];
-	    var dbpedia = dbpedia_name(data_p[i]['label']['value']);
-	    if (dbpedia) {
+	  table_upper[i] = data_p[i];
+	  var dbpedia = dbpedia_name(data_p[i]['label']['value']);
+	  if (dbpedia) {
 		table_upper[i]['dbpedia'] = dbpedia.name;
 		list += '( ' + dbpedia.uri + ' )';
-	    }
+	  }
 	}
-    });
-
-    var table_lower = [];
-    $.getJSON('/taxa/sparql_search.php?taxid_to_get_lower=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
-    	var data_p = data['results']['bindings'];
-    	for (var i=0; i<data_p.length; i++) {
-    	    table_lower[i] = data_p[i];
-	    var dbpedia = dbpedia_name(data_p[i]['label']['value']);
-	    if (dbpedia) {
-    		table_lower[i]['dbpedia'] = dbpedia.name;
-    		list += '( ' + dbpedia.uri + ' )';
-	    }
-    	}
-    });
-
-    var table_sister = [];
-    $.getJSON('/taxa/sparql_search.php?taxid_to_get_sisters=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
-      var data_p = data['results']['bindings'];
-      for (var i=0; i<data_p.length; i++) {
-    	table_sister[i] = data_p[i];
-	    var dbpedia = dbpedia_name(data_p[i]['label']['value']);
-	    if (dbpedia) {
-    	  table_sister[i]['dbpedia'] = dbpedia.name;
-    	  list += '( ' + dbpedia.uri + ' )';
-	    }
-      }
-    });
-
-    // Use DBpedia to translate
-    var dbpedia_labe_en = {};
-    var dbpedia_labe_local = {};
-    $.getJSON('/taxa/sparql_search.php?tax_list_to_get_local=' + list + '&local_lang=' + lang, function(data) {
-    	var data_p = data['results']['bindings'];
-    	for (var i=0; i<data_p.length; i++) {
-	    var dbpedia_uri = data_p[i]['dbpedia_resource']['value'];
-	    if (data_p[i]['label_en']) {
-		dbpedia_labe_en[dbpedia_uri] = data_p[i]['label_en']['value'];
-	    }
-	    if (data_p[i]['label_local'] && lang != "en") {
-		dbpedia_labe_local[dbpedia_uri] = data_p[i]['label_local']['value'];
-	    }
-    	}
-    });
-
-    // Show tables
-    var html = '<table id="taxonomy" class="hierarchy" border="1">';
-    html += '<tr><th colspan="3">Taxonomic hierarchy</th>';
-    html += '<th align="center"><font size="2"><i>N</i></font></th></tr>';
-    for (var i=0; i<table_upper.length; i++) {
-	var rank = table_upper[i]['rank']['value'].replace(/.*\//, '');
-      var label = table_upper[i]['label']['value'];
-      var wiki = '';
-	  if (table_upper[i]['dbpedia']) {
-	    var dbpedia_uri = 'http://dbpedia.org/resource/' + table_upper[i]['dbpedia'];
-	    if (dbpedia_labe_en[dbpedia_uri]) {
-		  wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
-	    }
-	    if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
-		  var label_local = dbpedia_labe_local[dbpedia_uri];
-		  wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
-	    }
+  });
+  $.getJSON(sparql_search + '?taxid_to_get_lower=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+    var data_p = data['results']['bindings'];
+    for (var i=0; i<data_p.length; i++) {
+      table_lower[i] = data_p[i];
+	  var dbpedia = dbpedia_name(data_p[i]['label']['value']);
+	  if (dbpedia) {
+    	table_lower[i]['dbpedia'] = dbpedia.name;
+    	list += '( ' + dbpedia.uri + ' )';
 	  }
-	  label = '<td class="taxon_clickable" nowrap><i>' + label + '</i></td>';
-	  html += '<tr><td class="rank_clickable" nowrap>' +
-	    rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' +
-	    '<td align="right"><font size="2">'+ table_upper[i]['count']['value'] +'</font></td></tr>';
     }
+  });
+  $.getJSON(sparql_search + '?taxid_to_get_sisters=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+    var data_p = data['results']['bindings'];
+    for (var i=0; i<data_p.length; i++) {
+      table_sister[i] = data_p[i];
+	  var dbpedia = dbpedia_name(data_p[i]['label']['value']);
+	  if (dbpedia) {
+    	table_sister[i]['dbpedia'] = dbpedia.name;
+    	list += '( ' + dbpedia.uri + ' )';
+	  }
+    }
+  });
 
-    var main_count = 0;
-    for (var i=0; i<table_sister.length; i++) {
-      var rank = table_sister[i]['rank']['value'].replace(/.*\//, '');
-      var sister_taxid = table_sister[i]['taxon']['value'].replace(/.*\//, '');
-      var label = table_sister[i]['label']['value'];
-      var sister_count = table_sister[i]['count']['value'];
-      var wiki = '';
-	  if (table_sister[i]['dbpedia']) {
-    	var dbpedia_uri = 'http://dbpedia.org/resource/' + table_sister[i]['dbpedia'];
-    	if (dbpedia_labe_en[dbpedia_uri]) {
-    	  wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
-    	}
-    	if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
-    	  var label_local = dbpedia_labe_local[dbpedia_uri];
-    	  wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
-    	}
+  // Use DBpedia to translate
+  var dbpedia_labe_en = {};
+  var dbpedia_labe_local = {};
+  $.getJSON(sparql_search + '?tax_list_to_get_local=' + list + '&local_lang=' + lang, function(data) {
+    var data_p = data['results']['bindings'];
+    for (var i=0; i<data_p.length; i++) {
+	  var dbpedia_uri = data_p[i]['dbpedia_resource']['value'];
+	  if (data_p[i]['label_en']) {
+		dbpedia_labe_en[dbpedia_uri] = data_p[i]['label_en']['value'];
 	  }
-	  var rank_orig = rank;
-	  if (sister_taxid == taxid) {
-	    rank = '<b>' + rank + '</b>';
+	  if (data_p[i]['label_local'] && lang != "en") {
+		dbpedia_labe_local[dbpedia_uri] = data_p[i]['label_local']['value'];
 	  }
-	  var mark = '';
-	  if (sister_taxid == taxid) {
-	    mark = '-&ensp;';
-	  } else {
-	    mark = '+ ';
+    }
+  });
+
+  // Show tables
+  var html = '<table id="taxonomy" class="hierarchy" border="1">';
+  html += '<tr><th colspan="3">Taxonomic hierarchy</th>';
+  html += '<th align="center"><font size="2"><i>N</i></font></th></tr>';
+  for (var i=0; i<table_upper.length; i++) {
+	var rank = table_upper[i]['rank']['value'].replace(/.*\//, '');
+    var label = table_upper[i]['label']['value'];
+    var wiki = '';
+	if (table_upper[i]['dbpedia']) {
+	  var dbpedia_uri = 'http://dbpedia.org/resource/' + table_upper[i]['dbpedia'];
+	  if (dbpedia_labe_en[dbpedia_uri]) {
+		wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
 	  }
-	  if (rank_orig == "Superkingdom") {
-	  } else {
-	    mark = '&ensp;' + mark;
+	  if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
+		var label_local = dbpedia_labe_local[dbpedia_uri];
+		wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
 	  }
+	}
+	label = '<td class="taxon_clickable" nowrap><i>' + label + '</i></td>';
+	html += '<tr><td class="rank_clickable" nowrap>' +
+	  rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' +
+	  '<td align="right"><font size="2">'+ table_upper[i]['count']['value'] +'</font></td></tr>';
+  }
+
+  var main_count = 0;
+  for (var i=0; i<table_sister.length; i++) {
+    var rank = table_sister[i]['rank']['value'].replace(/.*\//, '');
+    var sister_taxid = table_sister[i]['taxon']['value'].replace(/.*\//, '');
+    var label = table_sister[i]['label']['value'];
+    var sister_count = table_sister[i]['count']['value'];
+    var wiki = '';
+	if (table_sister[i]['dbpedia']) {
+      var dbpedia_uri = 'http://dbpedia.org/resource/' + table_sister[i]['dbpedia'];
+      if (dbpedia_labe_en[dbpedia_uri]) {
+    	wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
+      }
+      if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
+    	var label_local = dbpedia_labe_local[dbpedia_uri];
+    	wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
+      }
+	}
+	var rank_orig = rank;
+	if (sister_taxid == taxid) {
+	  rank = '<b>' + rank + '</b>';
+	}
+	var mark = '';
+	if (sister_taxid == taxid) {
+	  mark = '-&ensp;';
+	} else {
+	  mark = '+ ';
+	}
+	if (rank_orig == "Superkingdom") {
+	} else {
+	  mark = '&ensp;' + mark;
+	}
 	// if (rank_orig == "Species") {
 	//     // mark = '&emsp;&ensp;';
 	//     mark = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	// }
 
-	  if (sister_taxid == taxid) {
-    	label = '<td nowrap><i><b>' + label + '</b></i></td>';
-	    html += '<tr bgcolor="#E3E3E3"><td nowrap>';
-	  } else {
-	    label = '<td class="taxon_clickable" nowrap><i>' + label + '</i></td>';
-    	html += '<tr><td class="rank_clickable" nowrap>';
-	  }
-	  html += mark + rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' + 
-	    '<td align="right"><font size="2">' + sister_count + '</font></td>' + '</tr>';
+	if (sister_taxid == taxid) {
+      label = '<td nowrap><i><b>' + label + '</b></i></td>';
+	  html += '<tr bgcolor="#E3E3E3"><td nowrap>';
+	} else {
+	  label = '<td class="taxon_clickable" nowrap><i>' + label + '</i></td>';
+      html += '<tr><td class="rank_clickable" nowrap>';
+	}
+	html += mark + rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' + 
+	  '<td align="right"><font size="2">' + sister_count + '</font></td>' + '</tr>';
 
-	  if (sister_taxid == taxid) {
-	    main_count = sister_count;
-	    for (var j=0; j<table_lower.length; j++) {
-    		var rank = table_lower[j]['rank']['value'].replace(/.*\//, '');
-    		var label = table_lower[j]['label']['value'];
-    		var lower_count = table_lower[j]['count']['value'];
-    		var wiki = '';
+	if (sister_taxid == taxid) {
+	  main_count = sister_count;
+	  for (var j=0; j<table_lower.length; j++) {
+    	var rank = table_lower[j]['rank']['value'].replace(/.*\//, '');
+    	var label = table_lower[j]['label']['value'];
+    	var lower_count = table_lower[j]['count']['value'];
+    	var wiki = '';
 		if (table_lower[j]['dbpedia']) {
-    		    var dbpedia_uri = 'http://dbpedia.org/resource/' + table_lower[j]['dbpedia'];
-    		    if (dbpedia_labe_en[dbpedia_uri]) {
-    			wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
-    		    }
-    		    if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
-    			var label_local = dbpedia_labe_local[dbpedia_uri];
-    			wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
-    		    }
+    	  var dbpedia_uri = 'http://dbpedia.org/resource/' + table_lower[j]['dbpedia'];
+    	  if (dbpedia_labe_en[dbpedia_uri]) {
+    		wiki += '<a target="_blank" href="http://en.wikipedia.org/wiki/' + dbpedia_name(dbpedia_labe_en[dbpedia_uri]).name + '">*</a> ';
+    	  }
+    	  if (dbpedia_labe_local[dbpedia_uri] && lang != "en") {
+    		var label_local = dbpedia_labe_local[dbpedia_uri];
+    		wiki += '<a target="_blank" href="http://' + lang + '.wikipedia.org/wiki/' + label_local + '">' + label_local + '</a>';
+    	  }
 		}
 		// if (rank == "Species" && rank_orig == "Genus") {
-		    rank = '&emsp;&emsp;&emsp;' + rank;
+		rank = '&emsp;&emsp;&emsp;' + rank;
 		// } else if (rank == "Superkingdom") {
 		//     rank = '+ ' + rank;
 		// } else {
 		//     rank = '&emsp;&emsp;+ ' + rank;
 		// }
 		label = '<td class="taxon_clickable" nowrap><i>' + label + '</i></td>';
-    		html += '<tr><td class="rank_clickable" nowrap>' +
-		    rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' + 
-    		    '<td align="right"><font size="2">' + lower_count + '</font></td></tr>';
-	    }
+    	html += '<tr><td class="rank_clickable" nowrap>' +
+		  rank + '</td>' + label + '<td nowrap><font size="2">' + wiki + '</font></td>' + 
+    	  '<td align="right"><font size="2">' + lower_count + '</font></td></tr>';
+	  }
 	}
-	
-    }
+  }
+  html += '</table>'
 
-    html += '</table>'
-    $('#taxonomy_div').html(html);
+  $('#taxonomy_div').html(html);
 
-    return main_count;
+  return main_count;
 }
 
 function show_dbpedia(taxon_name, taxid, local_lang) {
@@ -437,7 +422,7 @@ function show_dbpedia(taxon_name, taxid, local_lang) {
 	return;
     }
     
-    $.getJSON('/taxa/sparql_search.php?dbpedia_entry=' + dbpedia.uri + '&local_lang=' + local_lang, function(data) {
+    $.getJSON(sparql_search + '?dbpedia_entry=' + dbpedia.uri + '&local_lang=' + local_lang, function(data) {
 	var data_p = data['results']['bindings'];
 	var img = '';
 	var abst = '';
@@ -502,7 +487,7 @@ function show_genome_comparison(taxid) {
     var mbgd_page = '/htbin/cluster_map?show_summary=on&map_type=cluster_size&tabid=';
 
     var count_compared = 0;
-    $.getJSON('/taxa/sparql_search.php?taxid_to_get_dataset=' + taxid, function(data) {
+    $.getJSON(sparql_search + '?taxid_to_get_dataset=' + taxid, function(data) {
 	var data_p = data['results']['bindings'];
 	for (var i=0; i<data_p.length; i++) {
     	    count_compared = data_p[i]['count']['value'];
@@ -532,7 +517,7 @@ function show_genome_comparison(taxid) {
 
 function show_specific_genes(taxid) {
 
-    $.getJSON('/taxa/sparql_search.php?taxon_to_default_orgs=' + taxid, function(data) {
+    $.getJSON(sparql_search + '?taxon_to_default_orgs=' + taxid, function(data) {
       var data_p = data['results']['bindings'];
 	  var count_default = 0;
       for (var i=0; i<data_p.length; i++) {
@@ -599,7 +584,7 @@ function show_genome_list(rank, taxon_name, taxid, genome_type) {
 
   var count = 0;
 
-  $.getJSON('/taxa/sparql_search.php?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
+  $.getJSON(sparql_search + '?taxon_to_search_genomes=' + taxid + '&genome_type_to_search=' + genome_type, function(data) {
 	var data_p = data['results']['bindings'];
 	count = data_p.length;
 
