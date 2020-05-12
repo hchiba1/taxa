@@ -69,7 +69,7 @@ function show_selected_genomes() {
     '<th align="center"><button type="button" class="add_genome_all" title="Select all">' +
     '<img src="img/minus.png" border="0" height="15" width="15">' + '</button></th>' +
 	'<th>Ref</th>' +
-	'<th>Rep</th>' +
+	// '<th>Rep</th>' +
 	'<th>Proteome ID</th>' +
 	'<th>Genome ID</th>' +
 	'<th>Tax ID</th>' +
